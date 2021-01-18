@@ -1,23 +1,33 @@
 import React, { Component, Fragment } from 'react';
 import axios from 'axios';
-
+import { Form } from 'react-bootstrap';
 import Results from './results';
+import { MDBCol, MDBIcon } from "mdbreact";
+import Logo from "./movieImage1.jpg";
+import {
+  Row,
+  Col,
+} from "reactstrap";
 
 class SearchResults extends Component {
   state = {
     movies: null,
     loading: false,
     value: '',
-    searchString: ''
+    searchString: '',
+    movieArray: [],
+    resultlist: []
   };
   divStyle = {
-    margin: "100px",
+    margin: "50px",
     background: "aliceblue",
   };
 
   headerStyle = {
     fontFamily: "monospace",
     fontWeight: "bold",
+    display: "flex",
+    justifyContent: "center",
   };
 
   formStyle = {
@@ -25,10 +35,7 @@ class SearchResults extends Component {
     background: "white",
     borderStyle: "ridge",
     marginRight: '30px',
-    paddingBottom: '30px'
   };
-
-
 
   inputStyle = {
     marginLeft: "20px",
@@ -90,11 +97,18 @@ class SearchResults extends Component {
       `http://www.omdbapi.com/?s=${searchString}&apikey=36546a2c`
     );
     const movies = await res.data.Search;
-    this.setState({ movies, loading: false });
-    let movieList = movies
-    if (this.state.movies) {
-      debugger
-      movieList = <Results list={this.state.movies} searchString={this.state.value} />;
+    let movieArray = [];
+    if (movies != null) {
+      for (let i = 0; i < movies.length; i++) {
+        movieArray.push({
+          titleName: movies[i].Title,
+          titleYear: movies[i].Year
+        });
+      }
+      this.setState({ resultlist: movieArray })
+    }
+    if (movies === undefined) {
+      this.setState({ resultlist: [] })
     }
   };
 
@@ -111,35 +125,39 @@ class SearchResults extends Component {
   render() {
     return (
       <Fragment>
-        <div style={this.divStyle}>
-          {" "}
-          <h1 style={this.headerStyle}>The Shoppies</h1>
-          <div style={this.formStyle}>
+        <div className="wizard-basic-step">
+          <div style={this.divStyle}>
+            <h1 style={this.headerStyle}>The Shoppies</h1>
+            <div style={this.formStyle}>
+              <Row>
+                <Col style={{ margin: "15px" }}>
+                  <Form>
+                    <Form.Group >
+                      <MDBCol md="12">
 
-            <form>
-              <label style={this.titlelabel}>Movie Title:</label>
-              <br />
-              <span className="search-bar" style={this.searchBar}>
-                <i
-                  className="fa fa-search"
-                  style={this.faSearch}
-                  aria-hidden="true"
-                ></i>
-                <input style={this.inputStyle} type="text" name="name"
-                  onChange={e => this.onChangeHandler(e)} autoComplete="off"
-                  placeholder="Type something to search"
-                  value={this.state.value} />
-              </span>
-            </form>
-
-          </div>
-          <div className="Container" >
-            <div className="row">
-              <div className="col-md" style={this.container}>
-                <Results list={this.state.movies} searchString={this.state.value} />
-              </div>
-              <div className="col-md" style={this.container}>
-                <div> <label style={this.titlelabel}>Nominations </label> </div>
+                        <label>Movie Title</label>
+                        <form className="form-inline mb-4">
+                          <MDBIcon icon="search" />
+                          <input className="form-control form-control-sm ml-3 w-75" type="text"
+                            placeholder="Search for Movie Title" aria-label="Search"
+                            onChange={e => this.onChangeHandler(e)} autoComplete="off"
+                            value={this.state.value} />
+                        </form>
+                      </MDBCol>
+                      <Form.Text className="text-muted">
+                        Please enter at least three characters to search for Movie Title.
+                      </Form.Text>
+                    </Form.Group>
+                  </Form>
+                </Col>
+                <Col style={{ margin: "10px" }}> <img src={Logo} /> </Col>
+              </Row>
+            </div>
+            <div className="Container" >
+              <div className="row">
+                <div className="col-md" style={this.container}>
+                  <Results list={this.state.resultlist} searchString={this.state.value} />
+                </div>
               </div>
             </div>
           </div>
