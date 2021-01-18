@@ -16,20 +16,35 @@ class Results extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      nominateArray: []
+      nominateArray: [],
+      movieToNominate: []
     }
   }
   rowClick = async (id, type) => {
-    let movieToNominate = []
-    movieToNominate.push({
-      titleName: type.titleName,
-      titleYear: type.titleYear
-    })
-    this.setState({ nominateArray: movieToNominate })
+    debugger
+    if (this.state.nominateArray.length >= 5) {
+      alert("Maximum Nominations Exceeded")
+
+    } else if (this.state.nominateArray.length <= 4) {
+      let join = this.state.nominateArray.concat({
+        titleName: type.titleName,
+        titleYear: type.titleYear
+      })
+      this.setState({ nominateArray: join })
+    }
   };
 
-
+  deleteRow = (id, type) => {
+    debugger
+    let nominateArray1 = []
+    nominateArray1 = this.state.nominateArray;
+    nominateArray1.splice(type.tableData.id, 1);
+    this.setState({
+      nominateArray: nominateArray1
+    })
+  }
   render() {
+    debugger
     const {
       searchString, } = this.props
     return (
@@ -84,7 +99,7 @@ class Results extends Component {
                   actionsColumnIndex: -1,
                   search: false,
                   filtering: false,
-                  maxBodyHeight: "200px",
+                  maxBodyHeight: "250px",
                   pageSize: 5,
                   headerStyle: {
                     backgroundColor: '#01579b',
@@ -98,8 +113,7 @@ class Results extends Component {
                   {
                     icon: "Edit",
                     tooltip: "Delete",
-                    onClick: (event, rowData) =>
-                      this.rowClick(rowData.titleName, rowData),
+                    onClick: (event, rowData) => { this.deleteRow(rowData.titleName, rowData) },
                   },
                 ]}
               />
